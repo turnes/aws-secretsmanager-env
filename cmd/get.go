@@ -9,40 +9,43 @@ import (
 	"github.com/aws/aws-sdk-go/service/secretsmanager"
 	"github.com/spf13/cobra"
 	"github.com/turnes/aws-secretsmanager-env/tools"
+	"log"
 )
 
 var secretName string
 
 func init() {
-	getCmd.PersistentFlags().StringVarP(&Region, "region", "r", "", "AWS region Default: us-west-1")
-	//getCmd.MarkFlagRequired("region")
+	getCmd.PersistentFlags().StringVarP(&Region, "region", "r", "us-west-1", "AWS region Default: us-west-1")
 	//getCmd.PersistentFlags().StringVarP(&Secret, "name", "r", "", "AWS region (required)")
 	//getCmd.MarkFlagRequired("region")
 	rootCmd.AddCommand(getCmd)
-	Region = "us-west-1"
-
 }
 
 var getCmd = &cobra.Command{
 	Use:   "get",
-	Short: "Print the version number of Hugo",
-	Long:  `All software has versions. This is Hugo's`,
+	Short: "Get a secret from AWS Secrets Manager.",
+	Long:  `A secret has a name, a type, a region`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) != 1 {
-			fmt.Println("Wrong number of arguments.")
+			log.Fatal("Wrong number of arguments.")
 		}
 		secretName = args[0]
 		secretJson, err := getSecret()
 		if err != nil {
-			fmt.Println(err)
+			log.Fatal(err)
 		}
-		tools.JsonToEnv(secretJson)
-
-
+		envFile, err := tools.JsonToEnv(secretJson)
+		if err != nil {
+			log.Fatal(err)
+		}
+		err = tools.Save(secretName, envFile)
+		if err != nil {
+			log.Fatal(err)
+		}
 	},
 }
 
-func getSecret() (string, error){
+func getSecret() (string, error) {
 	//Create a Secrets Manager client
 	session := session.Must(session.NewSession())
 	svc := secretsmanager.New(session,
@@ -103,7 +106,7 @@ func getSecret() (string, error){
 	}
 
 	// Your code goes here.
-	if decodedBinarySecret != ""{
+	if decodedBinarySecret != "" {
 		return decodedBinarySecret, nil
 	}
 	return secretString, nil

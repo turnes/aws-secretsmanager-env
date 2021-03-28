@@ -3,14 +3,25 @@ package tools
 import (
 	"encoding/json"
 	"fmt"
+	"log"
+	"strings"
 )
 
-func JsonToEnv(j string) (env string){
+func JsonToEnv(j string) (env string, err error) {
 	var objmap map[string]interface{}
-	json.Unmarshal([]byte(j), &objmap)
-	for k, v := range objmap {
-		fmt.Printf("%s=%s\n", k,v)
+	err = json.Unmarshal([]byte(j), &objmap)
+	if err != nil {
+		log.Println("It could not parse the json: ", err)
 	}
-	env = "ok"
-	return 
+	var fileString strings.Builder
+	for k, v := range objmap {
+		fmt.Fprintf(&fileString, "%s=%s\n", k, v)
+	}
+	env = fileString.String()
+	return
 }
+
+//func EnvToJson(env file)  (json string, err error){
+//	json = "ss"
+//	return
+//}

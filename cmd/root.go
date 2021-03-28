@@ -2,32 +2,28 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"github.com/spf13/cobra"
+	"os"
 )
 
 var rootCmd = &cobra.Command{
 	Use:   "aws-secretsmanager-env",
-	Short: "Hugo is a very fast static site generator",
-	Long: `A Fast and Flexible Static Site Generator built with
-                love by spf13 and friends in Go.
-                Complete documentation is available at http://hugo.spf13.com`,
+	Short: "Aws-secretsmanager-env is a tool to manage and to parse AWS Secrets Manager.",
+	Long: `It's a tool to manage and to parse AWS Secrets Manager.
+You can list, retrieve, delete and upload `,
 	Run: func(cmd *cobra.Command, args []string) {
 
 	},
-
 }
 
 func init() {
 
 }
 
-
 var Secret string
 var Verbose bool
 var Source string
 var Region string
-
 
 func Execute() {
 	if err := rootCmd.Execute(); err != nil {
